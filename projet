@@ -1,0 +1,118 @@
+class CarnetOrdres:
+    def __init__(self):
+        self.ordresA = []
+        self.ordresV = []
+
+
+
+
+    def ajouter_vente(self, participant, quantite, prix):
+        self.ajoutOV=[]
+        self.ajoutOV.append(prix)
+        self.ajoutOV.append(quantite)
+        self.ajoutOV.append(participant)
+        self.ordresV.append(self.ajoutOV)
+        self.ordresV.sort(key=lambda x: x[2])  
+        for ordre1 in self.ordresV:
+            for ordre2 in self.ordresA:
+                if ordre1[0]==ordre2[2]:
+                    if ordre1[1]==ordre2[1]:
+                        self.ordresA.remove(ordre2)
+                        self.ordresV.remove(ordre1)
+                        self.print_carnet()
+                        print("la dernière transaction c'est effectué à " + str(ordre1[2]) + " €" + ", pour une quantité de " + str(ordre1[1])+" titres.")
+                    elif ordre1[1]<=ordre2[1]:
+                        self.ordresV.remove(ordre1)
+                        ordre2[1]=ordre2[1]-ordre1[1]
+                        self.print_carnet()
+                        print("la dernière transaction c'est effectué à " + str(ordre1[2]) + " €" + ", pour une quantité de " + str(ordre1[1]) + " titres.")
+                    else:
+                        self.ordresA.remove(ordre2)
+                        ordre1[1]=ordre1[1]-ordre2[1]
+                        self.print_carnet()
+                        print("la dernière transaction c'est effectué à " + str(ordre1[0]) + " €" + ", pour une quantité de " + str(ordre2[1]) + " titres.")
+           
+
+
+
+
+
+
+    def ajouter_achat(self, participant, quantite, prix):
+        self.ajoutOA=[]
+        self.ajoutOA.append(participant)
+        self.ajoutOA.append(quantite)
+        self.ajoutOA.append(prix)
+        self.ordresA.append(self.ajoutOA)
+        self.ordresA.sort(key=lambda x: x[2], reverse=True)
+        for ordre1 in self.ordresA:
+            for ordre2 in self.ordresV:
+                if ordre1[2]==ordre2[0]:
+                    if ordre1[1]==ordre2[1]:
+                        self.ordresA.remove(ordre2)
+                        self.ordresV.remove(ordre1)
+                        self.print_carnet()
+                        print("la dernière transaction c'est effectué à " + str(ordre1[2]) + " €"+ ", pour une quantité de "+str(ordre1[1])+" titres.")
+                    elif ordre1[1]<=ordre2[1]:
+                        self.ordresA.remove(ordre1)
+                        ordre2[1]=ordre2[1]-ordre1[1]
+                        self.print_carnet()
+                        print("la dernière transaction c'est effectué à "+str(ordre1[2])+" €"+", pour une quantité de "+str(ordre1[1])+" titres.")
+                    else:
+                        self.ordresV.remove(ordre2)
+                        ordre1[1]=ordre1[1]-ordre2[1]
+                        self.print_carnet()
+                        print("la dernière transaction c'est effectué à "+str(ordre1[2])+" €"+", pour une quantité de "+str(ordre2[1])+" titres.")
+
+
+
+# annuler ordres
+    def annuler(self, participant, type_ordre, quantite, prix):
+        if type_ordre == "achat":
+            for ordre in self.ordresA:
+                if ordre[0] == participant and ordre[1] == quantite and ordre[2] == prix:
+                    self.ordresA.remove(ordre)
+                    print("l'ordre de "+str(type_ordre)+", émis par "+str(participant)+", à une cotation de "+str(prix)+"€, pour une quantité de "+str(quantite)+" titres, a été annulé.")
+                    return
+        elif type_ordre == "vente":
+            for ordre in self.ordresV:
+                if ordre[0] == participant and ordre[1] == quantite and ordre[2] == prix:
+                    self.ordresV.remove(ordre)
+                    print("l'ordre de "+str(type_ordre)+", émis par "+str(participant)+", à une cotation de "+str(prix)+"€, pour une quantité de "+str(quantite)+" titres, a été annulé.")
+                    return
+        self.print_carnet()
+
+
+
+
+#affichage carnet d'ordre
+    def print_carnet(self):
+        import pandas as pd
+        tableOV = pd.DataFrame(carnet.ordresV, columns=["prix", "quantité", "participants"])
+        tableOA = pd.DataFrame(carnet.ordresA, columns=["participants", "quantité", "prix"])
+        tableO = pd.concat([tableOA, tableOV], axis=1)
+        tableO = tableO.fillna('')
+        print(tableO)
+
+
+    # exemple d'utilsation
+carnet= CarnetOrdres()
+
+
+#placement ordres
+carnet.ajouter_achat("Divid_", 100, 15)
+carnet.ajouter_vente("Jeff_", 250, 11)
+carnet.ajouter_achat("Gwendoline_", 150, 14.5)
+carnet.ajouter_achat("Divid_",290,11)
+carnet.ajouter_vente("Jeff_", 250, 14.5)
+
+
+#afficher carnet d'ordres
+
+
+
+
+#annuler un ordre
+carnet.annuler("Divid_","achat", 100, 15)
+carnet.annuler("Jeff_", "vente", 250, 18)
+
